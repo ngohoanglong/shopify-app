@@ -54,8 +54,7 @@ function CustomDatePicker({ onChange }) {
 }
 function Index() {
   const defaultState = useRef({
-    emailFieldValue: "mer@ki.com",
-    nameFieldValue: "mer@ki",
+    countdownFieldValue: null,
   });
   const skipToContentRef = useRef(null);
 
@@ -67,41 +66,26 @@ function Index() {
   const [userMenuActive, setUserMenuActive] = useState(false);
   const [mobileNavigationActive, setMobileNavigationActive] = useState(false);
   const [modalActive, setModalActive] = useState(false);
-  const [nameFieldValue, setNameFieldValue] = useState(
-    defaultState.current.nameFieldValue
+  const [countdownFieldValue, setCountdownFieldValue] = useState(
+    defaultState.current.countdownFieldValue
   );
-  const [emailFieldValue, setEmailFieldValue] = useState(
-    defaultState.current.emailFieldValue
-  );
+
   const [storeName, setStoreName] = useState(
     defaultState.current.nameFieldValue
   );
-  const [supportSubject, setSupportSubject] = useState("");
-  const [supportMessage, setSupportMessage] = useState("");
 
-  const handleSubjectChange = useCallback(
-    (value) => setSupportSubject(value),
-    []
-  );
-  const handleMessageChange = useCallback(
-    (value) => setSupportMessage(value),
-    []
-  );
   const handleDiscard = useCallback(() => {
-    setEmailFieldValue(defaultState.current.emailFieldValue);
-    setNameFieldValue(defaultState.current.nameFieldValue);
+    setCountdownFieldValue(defaultState.current.countdownFieldValue);
     setIsDirty(false);
   }, []);
   const handleSave = useCallback(() => {
-    defaultState.current.nameFieldValue = nameFieldValue;
-    defaultState.current.emailFieldValue = emailFieldValue;
-
+    defaultState.current.countdownFieldValue = countdownFieldValue;
     setIsDirty(false);
     setToastActive(true);
-    setStoreName(defaultState.current.nameFieldValue);
-  }, [emailFieldValue, nameFieldValue]);
+    setStoreName(defaultState.current.countdownFieldValue);
+  }, [countdownFieldValue]);
   const handleFieldChange = useCallback((value) => {
-    setNameFieldValue(value);
+    setCountdownFieldValue(value);
     value && setIsDirty(true);
   }, []);
 
