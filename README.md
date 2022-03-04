@@ -33,6 +33,9 @@ We will be moving to [Express](https://expressjs.com/) to keep Shopify's framewo
 Our sample app currently uses both Koa and Next.js which makes the server-side unnecessarily complex to use and maintain.
 
 Try it out with this command, understanding that things may not be totally stable yet: `npx degit shopify/shopify-app-node#sample_app_updates`.
+shopify login --store=designer-wow.com
+shopify app tunnel auth <token>
+shopify app serve
 
 ## License
 
