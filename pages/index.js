@@ -1,10 +1,12 @@
+import React, { useCallback, useRef, useState } from "react";
 import {
-  ActionList,
   AppProvider,
+  ActionList,
+  Avatar,
   Card,
   ContextualSaveBar,
   FormLayout,
-  Heading,
+  Frame,
   Layout,
   Loading,
   Modal,
@@ -17,13 +19,43 @@ import {
   TextField,
   Toast,
   TopBar,
+  DatePicker,
 } from "@shopify/polaris";
-import { Provider, ResourcePicker } from "@shopify/app-bridge-react";
-import { useCallback, useRef, useState } from "react";
+import {
+  ArrowLeftMinor,
+  ConversationMinor,
+  HomeMajor,
+  OrdersMajor,
+} from "@shopify/polaris-icons";
+import { useEffect } from "react";
+function CustomDatePicker({ onChange }) {
+  const [{ month, year }, setDate] = useState({ month: 1, year: 2018 });
+  const [selectedDates, setSelectedDates] = useState({
+    start: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
+    end: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
+  });
+
+  const handleMonthChange = useCallback(
+    (month, year) => setDate({ month, year }),
+    []
+  );
+  useEffect(() => {
+    onChange({ month, year });
+  }, [month, year]);
+  return (
+    <DatePicker
+      month={month}
+      year={year}
+      onChange={setSelectedDates}
+      onMonthChange={handleMonthChange}
+      selected={selectedDates}
+    />
+  );
+}
 function Index() {
   const defaultState = useRef({
-    emailFieldValue: "dharma@jadedpixel.com",
-    nameFieldValue: "Jaded Pixel",
+    emailFieldValue: "mer@ki.com",
+    nameFieldValue: "mer@ki",
   });
   const skipToContentRef = useRef(null);
 
@@ -68,14 +100,11 @@ function Index() {
     setToastActive(true);
     setStoreName(defaultState.current.nameFieldValue);
   }, [emailFieldValue, nameFieldValue]);
-  const handleNameFieldChange = useCallback((value) => {
+  const handleFieldChange = useCallback((value) => {
     setNameFieldValue(value);
     value && setIsDirty(true);
   }, []);
-  const handleEmailFieldChange = useCallback((value) => {
-    setEmailFieldValue(value);
-    value && setIsDirty(true);
-  }, []);
+
   const handleSearchResultsDismiss = useCallback(() => {
     setSearchActive(false);
     setSearchValue("");
@@ -133,7 +162,7 @@ function Index() {
   const userMenuMarkup = (
     <TopBar.UserMenu
       actions={userMenuActions}
-      name="Dharma"
+      name="Meraki"
       detail={storeName}
       initials="D"
       open={userMenuActive}
@@ -182,15 +211,15 @@ function Index() {
       />
       <Navigation.Section
         separator
-        title="Jaded Pixel App"
+        title="Meraki App"
         items={[
           {
-            label: "Dashboard",
+            label: "Home",
             icon: HomeMajor,
             onClick: toggleIsLoading,
           },
           {
-            label: "Jaded Pixel Orders",
+            label: "Genaral",
             icon: OrdersMajor,
             onClick: toggleIsLoading,
           },
@@ -211,28 +240,16 @@ function Index() {
   );
 
   const actualPageMarkup = (
-    <Page title="Account">
+    <Page title="General">
       <Layout>
         {skipToContentTarget}
         <Layout.AnnotatedSection
-          title="Account details"
-          description="Jaded Pixel will use this as your account information."
+          title="Countdown timer"
+          description="Select date and time"
         >
           <Card sectioned>
             <FormLayout>
-              <TextField
-                label="Full name"
-                value={nameFieldValue}
-                onChange={handleNameFieldChange}
-                autoComplete="name"
-              />
-              <TextField
-                type="email"
-                label="Email"
-                value={emailFieldValue}
-                onChange={handleEmailFieldChange}
-                autoComplete="email"
-              />
+              <CustomDatePicker onChange={handleFieldChange} />
             </FormLayout>
           </Card>
         </Layout.AnnotatedSection>
@@ -269,19 +286,7 @@ function Index() {
     >
       <Modal.Section>
         <FormLayout>
-          <TextField
-            label="Subject"
-            value={supportSubject}
-            onChange={handleSubjectChange}
-            autoComplete="off"
-          />
-          <TextField
-            label="Message"
-            value={supportMessage}
-            onChange={handleMessageChange}
-            autoComplete="off"
-            multiline
-          />
+          <CustomDatePicker onChange={handleFieldChange} />
         </FormLayout>
       </Modal.Section>
     </Modal>

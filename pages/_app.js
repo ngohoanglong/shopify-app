@@ -55,11 +55,11 @@ class MyApp extends App {
       logo: {
         width: 124,
         topBarSource:
-          "https://cdn.shopify.com/s/files/1/0446/6937/files/jaded-pixel-logo-color.svg?6215648040070010999",
+          "cdn.shopify.com/s/files/1/0563/0938/3354/files/Text-Logo-For-web-1000_163fb4cf-5e59-40ce-b248-00858dc29246_x320-1_400x.png?v=1638697985",
         contextualSaveBarSource:
-          "https://cdn.shopify.com/s/files/1/0446/6937/files/jaded-pixel-logo-gray.svg?6215648040070010999",
-        url: "http://jadedpixel.com",
-        accessibilityLabel: "Jaded Pixel",
+          "cdn.shopify.com/s/files/1/0563/0938/3354/files/Text-Logo-For-web-1000_163fb4cf-5e59-40ce-b248-00858dc29246_x320-1_400x.png?v=1638697985",
+        url: "http://google.com",
+        accessibilityLabel: "Mer@ki",
       },
     };
     const { Component, pageProps, host } = this.props;
@@ -68,6 +68,7 @@ class MyApp extends App {
         <Provider
           config={{
             apiKey: API_KEY,
+            host,
             forceRedirect: true,
           }}
         >
