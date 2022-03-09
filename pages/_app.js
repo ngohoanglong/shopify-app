@@ -51,17 +51,7 @@ function MyProvider(props) {
 
 class MyApp extends App {
   render() {
-    const theme = {
-      logo: {
-        width: 124,
-        topBarSource:
-          "cdn.shopify.com/s/files/1/0563/0938/3354/files/Text-Logo-For-web-1000_163fb4cf-5e59-40ce-b248-00858dc29246_x320-1_400x.png?v=1638697985",
-        contextualSaveBarSource:
-          "cdn.shopify.com/s/files/1/0563/0938/3354/files/Text-Logo-For-web-1000_163fb4cf-5e59-40ce-b248-00858dc29246_x320-1_400x.png?v=1638697985",
-        url: "http://google.com",
-        accessibilityLabel: "Mer@ki",
-      },
-    };
+    const theme = {};
     const { Component, pageProps, host } = this.props;
     return (
       <AppProvider theme={theme} i18n={translations}>

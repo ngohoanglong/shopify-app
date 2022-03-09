@@ -30,31 +30,6 @@ import {
 import { useEffect } from "react";
 import { useMutation, useQuery } from "react-apollo";
 import { gql } from "apollo-boost";
-function CustomDatePicker({ onChange, defaultValue }) {
-  const [selectedDates, setSelectedDates] = useState(() =>
-    defaultValue ? new Date(defaultValue) : new Date()
-  );
-  const [{ month, year }, setDate] = useState({
-    month: selectedDates.getMonth() + 1,
-    year: selectedDates.getFullYear(),
-  });
-
-  const handleMonthChange = useCallback((month, year) => {
-    setDate({ month, year });
-  }, []);
-  useEffect(() => {
-    onChange(selectedDates);
-  }, [onChange, selectedDates]);
-  return (
-    <DatePicker
-      month={month}
-      year={year}
-      onChange={({ start }) => setSelectedDates(start)}
-      onMonthChange={handleMonthChange}
-      selected={selectedDates}
-    />
-  );
-}
 const countdownQuery = gql`
   {
     shop {
@@ -84,11 +59,38 @@ const countdownMutation = gql`
     }
   }
 `;
+function CustomDatePicker({ onChange, defaultValue }) {
+  const [selectedDates, setSelectedDates] = useState(() =>
+    defaultValue ? new Date(defaultValue) : new Date()
+  );
+  const [{ month, year }, setDate] = useState({
+    month: selectedDates.getMonth(),
+    year: selectedDates.getFullYear(),
+  });
+
+  const handleMonthChange = useCallback((month, year) => {
+    setDate({ month, year });
+  }, []);
+  useEffect(() => {
+    if (defaultValue !== selectedDates) onChange(selectedDates);
+  }, [defaultValue, onChange, selectedDates]);
+  return (
+    <DatePicker
+      month={month}
+      year={year}
+      onChange={({ start }) => setSelectedDates(start)}
+      onMonthChange={handleMonthChange}
+      selected={selectedDates}
+    />
+  );
+}
+
 function Index() {
   const defaultState = useRef({
     countdownFieldValue: null,
   });
   const skipToContentRef = useRef(null);
+  const [refreshKey, setrefreshKey] = useState(false);
   const [toastActive, setToastActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
@@ -106,17 +108,20 @@ function Index() {
   useEffect(() => {
     if (countdownQueryResult?.data) {
       setIsLoading(false);
+      defaultState.current.countdownFieldValue =
+        countdownQueryResult?.data?.shop?.metafield?.value;
     }
   }, [countdownQueryResult?.data]);
   const handleDiscard = useCallback(() => {
     setCountdownFieldValue(defaultState.current.countdownFieldValue);
     setIsDirty(false);
+    setrefreshKey(Date.now());
   }, []);
   const handleSave = useCallback(() => {
     mutateFunction({
       variables: {
         metafields: {
-          ownerId: "gid://shopify/Shop/61542007042",
+          ownerId: countdownQueryResult?.data?.shop?.id,
           namespace: "global",
           key: "countdown_timer",
           value: countdownFieldValue,
@@ -127,11 +132,20 @@ function Index() {
     defaultState.current.countdownFieldValue = countdownFieldValue;
     setIsDirty(false);
     setToastActive(true);
-  }, [countdownFieldValue, mutateFunction]);
-  const handleFieldChange = useCallback((value) => {
-    setCountdownFieldValue(value);
-    value && setIsDirty(true);
-  }, []);
+  }, [
+    countdownFieldValue,
+    countdownQueryResult?.data?.shop?.id,
+    mutateFunction,
+  ]);
+  const handleFieldChange = useCallback(
+    (value) => {
+      setCountdownFieldValue(value);
+      countdownQueryResult?.data?.shop?.metafield?.value &&
+        defaultState.current.countdownFieldValue !== value &&
+        setIsDirty(true);
+    },
+    [countdownQueryResult?.data?.shop?.metafield?.value]
+  );
 
   const handleSearchResultsDismiss = useCallback(() => {
     setSearchActive(false);
@@ -248,7 +262,7 @@ function Index() {
   );
 
   const actualPageMarkup = (
-    <Page title="General">
+    <Page key={refreshKey} title="General">
       <Layout>
         {skipToContentTarget}
         <Layout.AnnotatedSection
