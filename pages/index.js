@@ -94,8 +94,7 @@ function Index() {
   const [toastActive, setToastActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
-  const [searchActive, setSearchActive] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+
   const [userMenuActive, setUserMenuActive] = useState(false);
   const [mobileNavigationActive, setMobileNavigationActive] = useState(false);
   const [countdownFieldValue, setCountdownFieldValue] = useState(
@@ -137,24 +136,11 @@ function Index() {
     countdownQueryResult?.data?.shop?.id,
     mutateFunction,
   ]);
-  const handleFieldChange = useCallback(
-    (value) => {
-      setCountdownFieldValue(value);
-      countdownQueryResult?.data?.shop?.metafield?.value &&
-        defaultState.current.countdownFieldValue !== value &&
-        setIsDirty(true);
-    },
-    [countdownQueryResult?.data?.shop?.metafield?.value]
-  );
+  const handleFieldChange = useCallback((value) => {
+    setCountdownFieldValue(value);
+    defaultState.current.countdownFieldValue !== value && setIsDirty(true);
+  }, []);
 
-  const handleSearchResultsDismiss = useCallback(() => {
-    setSearchActive(false);
-    setSearchValue("");
-  }, []);
-  const handleSearchFieldChange = useCallback((value) => {
-    setSearchValue(value);
-    setSearchActive(value.length > 0);
-  }, []);
   const toggleToastActive = useCallback(
     () => setToastActive((toastActive) => !toastActive),
     []
@@ -197,7 +183,7 @@ function Index() {
     <TopBar.UserMenu
       actions={userMenuActions}
       name="Meraki"
-      initials="D"
+      initials="👍"
       open={userMenuActive}
       onToggle={toggleUserMenuActive}
     />
@@ -212,22 +198,10 @@ function Index() {
     />
   );
 
-  const searchFieldMarkup = (
-    <TopBar.SearchField
-      onChange={handleSearchFieldChange}
-      value={searchValue}
-      placeholder="Search"
-    />
-  );
-
   const topBarMarkup = (
     <TopBar
       showNavigationToggle
       userMenu={userMenuMarkup}
-      searchResultsVisible={searchActive}
-      searchField={searchFieldMarkup}
-      searchResults={searchResultsMarkup}
-      onSearchResultsDismiss={handleSearchResultsDismiss}
       onNavigationToggle={toggleMobileNavigationActive}
     />
   );
@@ -235,15 +209,6 @@ function Index() {
   const navigationMarkup = (
     <Navigation location="/">
       <Navigation.Section
-        items={[
-          {
-            label: "Back to Shopify",
-            icon: ArrowLeftMinor,
-          },
-        ]}
-      />
-      <Navigation.Section
-        separator
         title="Meraki App"
         items={[
           {
