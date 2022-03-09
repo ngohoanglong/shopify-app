@@ -28,62 +28,106 @@ import {
   OrdersMajor,
 } from "@shopify/polaris-icons";
 import { useEffect } from "react";
-function CustomDatePicker({ onChange }) {
-  const [{ month, year }, setDate] = useState({ month: 1, year: 2018 });
-  const [selectedDates, setSelectedDates] = useState({
-    start: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
-    end: new Date("Wed Feb 07 2018 00:00:00 GMT-0500 (EST)"),
+import { useMutation, useQuery } from "react-apollo";
+import { gql } from "apollo-boost";
+function CustomDatePicker({ onChange, defaultValue }) {
+  const [selectedDates, setSelectedDates] = useState(() =>
+    defaultValue ? new Date(defaultValue) : new Date()
+  );
+  const [{ month, year }, setDate] = useState({
+    month: selectedDates.getMonth() + 1,
+    year: selectedDates.getFullYear(),
   });
 
-  const handleMonthChange = useCallback(
-    (month, year) => setDate({ month, year }),
-    []
-  );
+  const handleMonthChange = useCallback((month, year) => {
+    setDate({ month, year });
+  }, []);
   useEffect(() => {
-    onChange({ month, year });
-  }, [month, year]);
+    onChange(selectedDates);
+  }, [onChange, selectedDates]);
   return (
     <DatePicker
       month={month}
       year={year}
-      onChange={setSelectedDates}
+      onChange={({ start }) => setSelectedDates(start)}
       onMonthChange={handleMonthChange}
       selected={selectedDates}
     />
   );
 }
+const countdownQuery = gql`
+  {
+    shop {
+      id
+      metafield(namespace: "global", key: "countdown_timer") {
+        namespace
+        id
+        key
+        value
+      }
+    }
+  }
+`;
+const countdownMutation = gql`
+  mutation setMetafield($metafields: [MetafieldsSetInput!]!) {
+    metafieldsSet(metafields: $metafields) {
+      metafields {
+        namespace
+        id
+        key
+        value
+      }
+      userErrors {
+        code
+        message
+      }
+    }
+  }
+`;
 function Index() {
   const defaultState = useRef({
     countdownFieldValue: null,
   });
   const skipToContentRef = useRef(null);
-
   const [toastActive, setToastActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [userMenuActive, setUserMenuActive] = useState(false);
   const [mobileNavigationActive, setMobileNavigationActive] = useState(false);
-  const [modalActive, setModalActive] = useState(false);
   const [countdownFieldValue, setCountdownFieldValue] = useState(
     defaultState.current.countdownFieldValue
   );
-
-  const [storeName, setStoreName] = useState(
-    defaultState.current.nameFieldValue
+  const countdownQueryResult = useQuery(countdownQuery);
+  const [mutateFunction, { data, loading, error }] = useMutation(
+    countdownMutation
   );
-
+  useEffect(() => {
+    if (countdownQueryResult?.data) {
+      setIsLoading(false);
+    }
+  }, [countdownQueryResult?.data]);
   const handleDiscard = useCallback(() => {
     setCountdownFieldValue(defaultState.current.countdownFieldValue);
     setIsDirty(false);
   }, []);
   const handleSave = useCallback(() => {
+    mutateFunction({
+      variables: {
+        metafields: {
+          ownerId: "gid://shopify/Shop/61542007042",
+          namespace: "global",
+          key: "countdown_timer",
+          value: countdownFieldValue,
+          type: "single_line_text_field",
+        },
+      },
+    });
     defaultState.current.countdownFieldValue = countdownFieldValue;
     setIsDirty(false);
     setToastActive(true);
-    setStoreName(defaultState.current.countdownFieldValue);
-  }, [countdownFieldValue]);
+  }, [countdownFieldValue, mutateFunction]);
   const handleFieldChange = useCallback((value) => {
     setCountdownFieldValue(value);
     value && setIsDirty(true);
@@ -110,14 +154,6 @@ function Index() {
       setMobileNavigationActive(
         (mobileNavigationActive) => !mobileNavigationActive
       ),
-    []
-  );
-  const toggleIsLoading = useCallback(
-    () => setIsLoading((isLoading) => !isLoading),
-    []
-  );
-  const toggleModalActive = useCallback(
-    () => setModalActive((modalActive) => !modalActive),
     []
   );
 
@@ -147,7 +183,6 @@ function Index() {
     <TopBar.UserMenu
       actions={userMenuActions}
       name="Meraki"
-      detail={storeName}
       initials="D"
       open={userMenuActive}
       onToggle={toggleUserMenuActive}
@@ -198,21 +233,10 @@ function Index() {
         title="Meraki App"
         items={[
           {
-            label: "Home",
-            icon: HomeMajor,
-            onClick: toggleIsLoading,
-          },
-          {
             label: "Genaral",
-            icon: OrdersMajor,
-            onClick: toggleIsLoading,
+            icon: HomeMajor,
           },
         ]}
-        action={{
-          icon: ConversationMinor,
-          accessibilityLabel: "Contact support",
-          onClick: toggleModalActive,
-        }}
       />
     </Navigation>
   );
@@ -233,7 +257,12 @@ function Index() {
         >
           <Card sectioned>
             <FormLayout>
-              <CustomDatePicker onChange={handleFieldChange} />
+              <CustomDatePicker
+                onChange={handleFieldChange}
+                defaultValue={
+                  countdownQueryResult?.data?.shop?.metafield?.value
+                }
+              />
             </FormLayout>
           </Card>
         </Layout.AnnotatedSection>
@@ -258,24 +287,6 @@ function Index() {
 
   const pageMarkup = isLoading ? loadingPageMarkup : actualPageMarkup;
 
-  const modalMarkup = (
-    <Modal
-      open={modalActive}
-      onClose={toggleModalActive}
-      title="Contact support"
-      primaryAction={{
-        content: "Send",
-        onAction: toggleModalActive,
-      }}
-    >
-      <Modal.Section>
-        <FormLayout>
-          <CustomDatePicker onChange={handleFieldChange} />
-        </FormLayout>
-      </Modal.Section>
-    </Modal>
-  );
-
   return (
     <div style={{ height: "500px" }}>
       <Frame
@@ -289,7 +300,6 @@ function Index() {
         {loadingMarkup}
         {pageMarkup}
         {toastMarkup}
-        {modalMarkup}
       </Frame>
     </div>
   );
