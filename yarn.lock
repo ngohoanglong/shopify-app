@@ -1405,6 +1405,11 @@
   resolved "https://registry.yarnpkg.com/@shopify/polaris-icons/-/polaris-icons-4.18.1.tgz#1623ab00f738fcb8ea9736db2ab8f6c34433afe1"
   integrity sha512-zs0V5DS9RvEk5Du60o0O6UKPRuikZVuC1fulHmjLuhXjyzm9a9jQ4GwudHhWEXSvJC9WdFgvdgKKznzVyJAlTA==
 
+"@shopify/polaris-icons@^4.18.2":
+  version "4.18.2"
+  resolved "https://registry.yarnpkg.com/@shopify/polaris-icons/-/polaris-icons-4.18.2.tgz#71af7bb9c001275fd7723c5853110ae80a7acd95"
+  integrity sha512-Anl4Q59isVI29tcp/yG1jKQ+ndzsC0kHSAiVpdw4/3rGUCZrJwVq/BvKpKqtHMrYrypHCsAhzmVM1xOtzmPkxg==
+
 "@shopify/polaris-tokens@^3.0.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@shopify/polaris-tokens/-/polaris-tokens-3.1.0.tgz#1e02974e8640b49678ca88ac0dae1de89ed706d9"
@@ -8525,6 +8530,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+swr@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/swr/-/swr-1.2.2.tgz#6cae09928d30593a7980d80f85823e57468fac5d"
+  integrity sha512-ky0BskS/V47GpW8d6RU7CPsr6J8cr7mQD6+do5eky3bM0IyJaoi3vO8UhvrzJaObuTlGhPl2szodeB2dUd76Xw==
 
 symbol-observable@^1.0.2:
   version "1.2.0"
